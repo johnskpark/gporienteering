@@ -11,10 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The team orienteering problem with time windows.
+ * The multi-objective team orienteering problem with time windows.
  */
 
+// TODO need to fix this to be multi-objective as well.
 public class MOTOPTWInstance extends Instance {
+
+    private int numObjs;
 
     public MOTOPTWInstance(List<PlaceOfInterest> placeOfInterests,
                            PlaceOfInterest startPOI,
@@ -42,9 +45,10 @@ public class MOTOPTWInstance extends Instance {
         String[] segments;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            line = reader.readLine(); // k v N t
+            line = reader.readLine(); // k v N t m
             segments = line.split("\\s+");
             int numPOIs = Integer.valueOf(segments[2]);
+            numObjs = Integer.valueOf(segments[4]);
             reader.readLine(); // D Q, not relevant
 
             // read the POIs
@@ -55,8 +59,10 @@ public class MOTOPTWInstance extends Instance {
                 double x = Double.valueOf(segments[2]);
                 double y = Double.valueOf(segments[3]);
                 double duration = Double.valueOf(segments[4]);
-                double[] scores = new double[1];
-                scores[0] = Double.valueOf(segments[5]);
+                double[] scores = new double[numObjs];
+                for (int j = 5; j < 5 + numObjs; j++) {
+                    scores[j-5] = Double.valueOf(segments[j]);
+                }
                 double openTime = Double.valueOf(segments[segments.length-2]);
                 double closeTime = Double.valueOf(segments[segments.length-1]);
 

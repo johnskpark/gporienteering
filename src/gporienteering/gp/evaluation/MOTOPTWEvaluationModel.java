@@ -3,7 +3,7 @@ package gporienteering.gp.evaluation;
 import ec.EvolutionState;
 import ec.util.Parameter;
 import gporienteering.core.Instance;
-import gporienteering.core.TOPTWInstance;
+import gporienteering.core.MOTOPTWInstance;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class MOTOPTWEvaluationModel extends EvaluationModel {
 
             File file = new File("data/motoptw/" + dataset + "/" + filename + ".txt");
 
-            TOPTWInstance baseInstance = new TOPTWInstance();
+            MOTOPTWInstance baseInstance = new MOTOPTWInstance();
             baseInstance.readFromFile(file);
 
             for (int s = 0; s < samples; s++) {
