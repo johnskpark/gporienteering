@@ -13,7 +13,8 @@ import java.util.Map;
  */
 public enum Objective {
 
-    TOTAL_SCORE("total-score");
+    TOTAL_SCORE("total-score"),
+    TOTAL_SCORE_2("total-score-2");
 
     private final String name;
 

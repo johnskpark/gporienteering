@@ -78,6 +78,8 @@ public class Tour {
         switch (objective) {
             case TOTAL_SCORE:
                 return totalScores[0];
+            case TOTAL_SCORE_2:
+                return totalScores[1];
             default:
                 return Double.NaN;
         }

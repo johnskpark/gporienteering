@@ -1,0 +1,9 @@
+
+# The NSGA-II training procedure for the GP approach.
+
+parents.0 = train.params
+
+pop.subpop.0.species.fitness = ec.multiobjective.spea2.SPEA2MultiObjectiveFitness
+
+eval = ec.multiobjective.spea2.SPEA2Evaluator
+breed = ec.multiobjective.spea2.SPEA2Breeder

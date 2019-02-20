@@ -9,7 +9,7 @@ manual-policies.0 = gporienteering.decisionprocess.policy.ScoreOverTimePolicy
 manual-policies.1 = gporienteering.decisionprocess.policy.ScoreOverSlackPolicy
 
 # for gp-evolved policies
-train-path = /Users/yimei/Dropbox/GPOrienteering/
+train-path = /Users/yimei/Dropbox/GPOrienteering/ # TODO this needs to be fixed.
 solution-type = simple-solution
 fitness-type = simple-fitness
 num-trains = 1
@@ -23,9 +23,10 @@ eval.problem = gporienteering.gp.ReactiveGPHHProblem
 eval.problem.pool-filter = gporienteering.decisionprocess.poolfilter.ExpFeasiblePoolFilter
 eval.problem.tie-breaker = gporienteering.decisionprocess.tiebreaker.SimpleTieBreaker
 eval.problem.data = gputils.DoubleData
-eval.problem.eval-model = gporienteering.gp.evaluation.TOPTWEvaluationModel
-eval.problem.eval-model.objectives = 1
+eval.problem.eval-model = gporienteering.gp.evaluation.MOTOPTWEvaluationModel
+eval.problem.eval-model.objectives = 2
 eval.problem.eval-model.objectives.0 = total-score
+eval.problem.eval-model.objectives.1 = total-score-2
 eval.problem.eval-model.instances = 1
 eval.problem.eval-model.instances.0.dataset = c_r_rc_200_100
 eval.problem.eval-model.instances.0.file-name = r204
@@ -100,7 +101,7 @@ pop.subpop.0.species.ind.tree.0.tc = tc0
 
 #pop.subpop.0.species.fitness = ec.gp.koza.KozaFitness
 pop.subpop.0.species.fitness = ec.multiobjective.MultiObjectiveFitness
-pop.subpop.0.species.fitness.num-objectives = 1
+pop.subpop.0.species.fitness.num-objectives = 2
 pop.subpop.0.species.fitness.maximize = false
 pop.subpop.0.duplicate-retries = 100
 

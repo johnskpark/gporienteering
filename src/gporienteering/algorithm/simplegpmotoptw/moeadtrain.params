@@ -1,0 +1,9 @@
+
+# The NSGA-II training procedure for the GP approach.
+
+parents.0 = train.params
+
+pop.subpop.0.species.fitness = ec.multiobjective.moead.MOEADMultiObjectiveFitness
+
+eval = ec.multiobjective.moead.MOEADEvaluator
+breed = ec.multiobjective.moead.MOEADBreeder
