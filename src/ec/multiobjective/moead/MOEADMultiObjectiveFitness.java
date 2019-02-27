@@ -15,10 +15,13 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-/* 
+/*
  * MOEADMultiObjectiveFitness.java
- * 
+ *
  * Created: Thu Feb 04 2010
  * By: Faisal Abidi and Sean Luke
  */
@@ -32,74 +35,84 @@ import java.io.LineNumberReader;
  */
 
 // TODO this is just a copy of the NSGA-II fitness file, rewrite later down the line.
-public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness
-    {
-    public static final String NSGA2_RANK_PREAMBLE = "Rank: ";
-    public static final String NSGA2_SPARSITY_PREAMBLE = "Sparsity: ";
+public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
 
-    public String[] getAuxilliaryFitnessNames() { return new String[] { "Rank", "Sparsity" }; }
-    public double[] getAuxilliaryFitnessValues() { return new double[] { rank, sparsity }; }
-        
-    /** Pareto front rank measure (lower ranks are better) */
-    public int rank;
+    public static final String MOEAD_RANK_PREAMBLE = "ScalarFitness: ";
+    public static final String MOEAD_SPARSITY_PREAMBLE = "WeightVector: ";
 
-    /** Sparsity along front rank measure (higher sparsity is better) */
-    public double sparsity;
+    public String[] getAuxilliaryFitnessNames() { return new String[] { "ScalarFitness" }; }
+    public double[] getAuxilliaryFitnessValues() { return new double[] { fitness }; }
 
-    public String fitnessToString()
-        {
-        return super.fitnessToString() + "\n" + NSGA2_RANK_PREAMBLE + Code.encode(rank) + "\n" + NSGA2_SPARSITY_PREAMBLE + Code.encode(sparsity);
-        }
+    // Scalar fitness calculated from the weight vector.
+    public double fitness;
 
-    public String fitnessToStringForHumans()
-        {
-        return super.fitnessToStringForHumans() + "\n" + NSGA2_RANK_PREAMBLE + rank + "\n" + NSGA2_SPARSITY_PREAMBLE + sparsity;
-        }
+    // The weight vector assigned to the individual.
+    public List<Double> weights;
 
-    public void readFitness(final EvolutionState state, final LineNumberReader reader) throws IOException
-        {
+    public String fitnessToString() {
+        return super.fitnessToString() + "\n" + MOEAD_RANK_PREAMBLE + Code.encode(fitness) + "\n" + MOEAD_SPARSITY_PREAMBLE + Code.encode(weights.toString());
+    }
+
+    public String fitnessToStringForHumans() {
+        return super.fitnessToStringForHumans() + "\n" + MOEAD_RANK_PREAMBLE + fitness + "\n" + MOEAD_SPARSITY_PREAMBLE + weights.toString();
+    }
+
+    public void readFitness(final EvolutionState state, final LineNumberReader reader) throws IOException {
         super.readFitness(state, reader);
-        rank = Code.readIntegerWithPreamble(NSGA2_RANK_PREAMBLE, state, reader);
-        sparsity = Code.readDoubleWithPreamble(NSGA2_SPARSITY_PREAMBLE, state, reader);
-        }
+        fitness = Code.readDoubleWithPreamble(MOEAD_RANK_PREAMBLE, state, reader);
 
-    public void writeFitness(final EvolutionState state, final DataOutput dataOutput) throws IOException
-        {
+        String weightsStr = Code.readStringWithPreamble(MOEAD_SPARSITY_PREAMBLE, state, reader);
+        weights = convertWeightStr(weightsStr);
+    }
+
+    public void writeFitness(final EvolutionState state, final DataOutput dataOutput) throws IOException {
         super.writeFitness(state, dataOutput);
-        dataOutput.writeInt(rank);
-        dataOutput.writeDouble(sparsity);
+        dataOutput.writeDouble(fitness);
+        dataOutput.writeChars(weights.toString());
         writeTrials(state, dataOutput);
-        }
+    }
 
-    public void readFitness(final EvolutionState state, final DataInput dataInput) throws IOException
-        {
+    public void readFitness(final EvolutionState state, final DataInput dataInput) throws IOException {
         super.readFitness(state, dataInput);
-        rank = dataInput.readInt();
-        sparsity = dataInput.readDouble();
-        readTrials(state, dataInput);
-        }
 
-    public boolean equivalentTo(Fitness _fitness)
-        {
-        MOEADMultiObjectiveFitness other = (MOEADMultiObjectiveFitness) _fitness;
-        return (rank == ((MOEADMultiObjectiveFitness) _fitness).rank) &&
-            (sparsity == other.sparsity);
+        fitness = dataInput.readDouble();
+
+        String weightsStr = "";
+        char nextChar;
+        while ((nextChar = dataInput.readChar()) != ']') {
+            weightsStr += nextChar;
         }
+        weights = convertWeightStr(weightsStr);
+
+        readTrials(state, dataInput);
+    }
+
+    private List<Double> convertWeightStr(String weightsStr) {
+        weightsStr = weightsStr.replaceAll("[\\[\\] ]", "");
+        List<String> split = Arrays.asList(weightsStr.split(","));
+
+        return split.stream().map(x -> Double.parseDouble(x)).collect(Collectors.toList());
+    }
+
+    // TODO need to check this against the actual algorithm.
+    public boolean equivalentTo(Fitness _fitness) {
+        MOEADMultiObjectiveFitness other = (MOEADMultiObjectiveFitness) _fitness;
+        return (this.fitness == ((MOEADMultiObjectiveFitness) _fitness).fitness);
+    }
 
     /**
      * We specify the tournament selection criteria, Rank (lower
      * values are better) and Sparsity (higher values are better)
      */
-    public boolean betterThan(Fitness _fitness)
-        {
+    // TODO need to check this against the actual algorithm.
+    public boolean betterThan(Fitness _fitness) {
         MOEADMultiObjectiveFitness other = (MOEADMultiObjectiveFitness) _fitness;
-        // Rank should always be minimized.
-        if (rank < ((MOEADMultiObjectiveFitness) _fitness).rank)
+
+        // Fitness should be minimised.
+        if (this.fitness < other.fitness) {
             return true;
-        else if (rank > ((MOEADMultiObjectiveFitness) _fitness).rank)
+        } else {
             return false;
-                
-        // otherwise try sparsity
-        return (sparsity > other.sparsity);
         }
     }
+}

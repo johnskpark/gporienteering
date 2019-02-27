@@ -1,4 +1,6 @@
-This package contains an implementation of the Non-Dominated Sorting 
+# TODO rewrite this part here.
+
+This package contains an implementation of the Non-Dominated Sorting
 Genetic Algorithm 2 (NSGA-II).
 
 Details of this approach can be found in the following paper:
