@@ -28,38 +28,38 @@ import java.util.stream.Collectors;
 
 /**
  * MOEADMultiObjectiveFitness is a subclass of MultiObjeciveFitness which
- * adds auxiliary fitness measures (sparsity, rank) largely used by MultiObjectiveStatistics.
+ * adds auxiliary scalarFitness measures (sparsity, rank) largely used by MultiObjectiveStatistics.
  * It also redefines the comparison measures to compare based on rank, and break ties
- * based on sparsity. 
+ * based on sparsity.
  *
  */
 
-// TODO this is just a copy of the NSGA-II fitness file, rewrite later down the line.
+// TODO this is just a copy of the NSGA-II scalarFitness file, rewrite later down the line.
 public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
 
     public static final String MOEAD_RANK_PREAMBLE = "ScalarFitness: ";
     public static final String MOEAD_SPARSITY_PREAMBLE = "WeightVector: ";
 
     public String[] getAuxilliaryFitnessNames() { return new String[] { "ScalarFitness" }; }
-    public double[] getAuxilliaryFitnessValues() { return new double[] { fitness }; }
+    public double[] getAuxilliaryFitnessValues() { return new double[] {scalarFitness}; }
 
-    // Scalar fitness calculated from the weight vector.
-    public double fitness;
+    // Scalar scalarFitness calculated from the weight vector.
+    public double scalarFitness;
 
     // The weight vector assigned to the individual.
     public List<Double> weights;
 
     public String fitnessToString() {
-        return super.fitnessToString() + "\n" + MOEAD_RANK_PREAMBLE + Code.encode(fitness) + "\n" + MOEAD_SPARSITY_PREAMBLE + Code.encode(weights.toString());
+        return super.fitnessToString() + "\n" + MOEAD_RANK_PREAMBLE + Code.encode(scalarFitness) + "\n" + MOEAD_SPARSITY_PREAMBLE + Code.encode(weights.toString());
     }
 
     public String fitnessToStringForHumans() {
-        return super.fitnessToStringForHumans() + "\n" + MOEAD_RANK_PREAMBLE + fitness + "\n" + MOEAD_SPARSITY_PREAMBLE + weights.toString();
+        return super.fitnessToStringForHumans() + "\n" + MOEAD_RANK_PREAMBLE + scalarFitness + "\n" + MOEAD_SPARSITY_PREAMBLE + weights.toString();
     }
 
     public void readFitness(final EvolutionState state, final LineNumberReader reader) throws IOException {
         super.readFitness(state, reader);
-        fitness = Code.readDoubleWithPreamble(MOEAD_RANK_PREAMBLE, state, reader);
+        scalarFitness = Code.readDoubleWithPreamble(MOEAD_RANK_PREAMBLE, state, reader);
 
         String weightsStr = Code.readStringWithPreamble(MOEAD_SPARSITY_PREAMBLE, state, reader);
         weights = convertWeightStr(weightsStr);
@@ -67,7 +67,7 @@ public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
 
     public void writeFitness(final EvolutionState state, final DataOutput dataOutput) throws IOException {
         super.writeFitness(state, dataOutput);
-        dataOutput.writeDouble(fitness);
+        dataOutput.writeDouble(scalarFitness);
         dataOutput.writeChars(weights.toString());
         writeTrials(state, dataOutput);
     }
@@ -75,7 +75,7 @@ public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
     public void readFitness(final EvolutionState state, final DataInput dataInput) throws IOException {
         super.readFitness(state, dataInput);
 
-        fitness = dataInput.readDouble();
+        scalarFitness = dataInput.readDouble();
 
         String weightsStr = "";
         char nextChar;
@@ -97,7 +97,7 @@ public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
     // TODO need to check this against the actual algorithm.
     public boolean equivalentTo(Fitness _fitness) {
         MOEADMultiObjectiveFitness other = (MOEADMultiObjectiveFitness) _fitness;
-        return (this.fitness == ((MOEADMultiObjectiveFitness) _fitness).fitness);
+        return (this.scalarFitness == ((MOEADMultiObjectiveFitness) _fitness).scalarFitness);
     }
 
     /**
@@ -109,7 +109,7 @@ public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
         MOEADMultiObjectiveFitness other = (MOEADMultiObjectiveFitness) _fitness;
 
         // Fitness should be minimised.
-        if (this.fitness < other.fitness) {
+        if (this.scalarFitness < other.scalarFitness) {
             return true;
         } else {
             return false;

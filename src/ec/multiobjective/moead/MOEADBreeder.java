@@ -27,13 +27,13 @@ import ec.util.Parameter;
  *
  * <p>NSGA-II has fixed archive size (the population size), and so ignores the 'elites'
  * declaration.  However it will adhere to the 'reevaluate-elites' parameter in SimpleBreeder
- * to determine whether to force fitness reevaluation.
+ * to determine whether to force scalarFitness reevaluation.
 
  */
 
 // TODO this is just a copy of the NSGA-II breeder file, rewrite later down the line.
-public class MOEADBreeder extends SimpleBreeder
-{
+public class MOEADBreeder extends SimpleBreeder {
+
     public void setup(final EvolutionState state, final Parameter base) {
         super.setup(state, base);
         // make sure SimpleBreeder's elites facility isn't being used
