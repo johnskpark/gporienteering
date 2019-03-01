@@ -20,14 +20,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /*
- * MOEADMultiObjectiveFitness.java
+ * MOEADWeightedSumFitness.java
  *
  * Created: Thu Feb 04 2010
  * By: Faisal Abidi and Sean Luke
  */
 
 /**
- * MOEADMultiObjectiveFitness is a subclass of MultiObjeciveFitness which
+ * MOEADWeightedSumFitness is a subclass of MultiObjeciveFitness which
  * adds auxiliary scalarFitness measures (sparsity, rank) largely used by MultiObjectiveStatistics.
  * It also redefines the comparison measures to compare based on rank, and break ties
  * based on sparsity.
@@ -47,14 +47,14 @@ public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
     public double scalarFitness;
 
     // The weight vector assigned to the individual.
-    public List<Double> weights;
+    public List<Double> weightVector;
 
     public String fitnessToString() {
-        return super.fitnessToString() + "\n" + MOEAD_RANK_PREAMBLE + Code.encode(scalarFitness) + "\n" + MOEAD_SPARSITY_PREAMBLE + Code.encode(weights.toString());
+        return super.fitnessToString() + "\n" + MOEAD_RANK_PREAMBLE + Code.encode(scalarFitness) + "\n" + MOEAD_SPARSITY_PREAMBLE + Code.encode(weightVector.toString());
     }
 
     public String fitnessToStringForHumans() {
-        return super.fitnessToStringForHumans() + "\n" + MOEAD_RANK_PREAMBLE + scalarFitness + "\n" + MOEAD_SPARSITY_PREAMBLE + weights.toString();
+        return super.fitnessToStringForHumans() + "\n" + MOEAD_RANK_PREAMBLE + scalarFitness + "\n" + MOEAD_SPARSITY_PREAMBLE + weightVector.toString();
     }
 
     public void readFitness(final EvolutionState state, final LineNumberReader reader) throws IOException {
@@ -62,13 +62,13 @@ public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
         scalarFitness = Code.readDoubleWithPreamble(MOEAD_RANK_PREAMBLE, state, reader);
 
         String weightsStr = Code.readStringWithPreamble(MOEAD_SPARSITY_PREAMBLE, state, reader);
-        weights = convertWeightStr(weightsStr);
+        weightVector = convertWeightStr(weightsStr);
     }
 
     public void writeFitness(final EvolutionState state, final DataOutput dataOutput) throws IOException {
         super.writeFitness(state, dataOutput);
         dataOutput.writeDouble(scalarFitness);
-        dataOutput.writeChars(weights.toString());
+        dataOutput.writeChars(weightVector.toString());
         writeTrials(state, dataOutput);
     }
 
@@ -82,7 +82,7 @@ public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
         while ((nextChar = dataInput.readChar()) != ']') {
             weightsStr += nextChar;
         }
-        weights = convertWeightStr(weightsStr);
+        weightVector = convertWeightStr(weightsStr);
 
         readTrials(state, dataInput);
     }
@@ -94,7 +94,7 @@ public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
         return split.stream().map(x -> Double.parseDouble(x)).collect(Collectors.toList());
     }
 
-    // TODO need to check this against the actual algorithm.
+    /* FIXME Test against the actual algorithm */
     public boolean equivalentTo(Fitness _fitness) {
         MOEADMultiObjectiveFitness other = (MOEADMultiObjectiveFitness) _fitness;
         return (this.scalarFitness == ((MOEADMultiObjectiveFitness) _fitness).scalarFitness);
@@ -104,7 +104,7 @@ public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
      * We specify the tournament selection criteria, Rank (lower
      * values are better) and Sparsity (higher values are better)
      */
-    // TODO need to check this against the actual algorithm.
+    /* FIXME Test against the actual algorithm */
     public boolean betterThan(Fitness _fitness) {
         MOEADMultiObjectiveFitness other = (MOEADMultiObjectiveFitness) _fitness;
 
