@@ -192,6 +192,8 @@ public class MOEADEvaluator extends SimpleEvaluator {
         for (int s = 0; s < state.population.subpops.length; s++) {
             assignScalarFitness(state, state.population.subpops[s]);
         }
+
+        // TODO need to update archive
     }
 
     /**
@@ -248,6 +250,7 @@ public class MOEADEvaluator extends SimpleEvaluator {
      */
     public Individual[] buildArchive(EvolutionState state, int subpop) {
         throw new RuntimeException("Not yet implemented.");
+        // TODO do I even need this?
     }
 
 }
