@@ -36,6 +36,7 @@ public class MOEADBreeder extends SimpleBreeder {
 
     public void setup(final EvolutionState state, final Parameter base) {
         super.setup(state, base);
+        // TODO This part needs rework as well.
         // make sure SimpleBreeder's elites facility isn't being used
         for (int i = 0; i < elite.length; i++) { // we use elite.length here instead of pop.subpops.length because the population hasn't been made yet.
             if (usingElitism(i)) {

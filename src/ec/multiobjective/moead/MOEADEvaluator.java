@@ -181,13 +181,13 @@ public class MOEADEvaluator extends SimpleEvaluator {
      * Evaluates the population, then builds the archive and reduces the population to just the archive.
      */
     public void evaluatePopulation(final EvolutionState state) {
-        super.evaluatePopulation(state);
-
         if (state.generation == 0) {
             for (int s = 0; s < state.population.subpops.length; s++) {
                 assignWeightVectors(state, s);
             }
         }
+
+        super.evaluatePopulation(state);
 
         for (int s = 0; s < state.population.subpops.length; s++) {
             assignScalarFitness(state, state.population.subpops[s]);
