@@ -233,6 +233,6 @@ eval.problem.eval-model.instances.0.duration-ulevel = 0.2
 # ==============================
 # The GPHH evolution state parameters
 # ==============================
-terminals-from = basic
+terminals-from = multiobjective
 include-erc = true
 rotate-eval-model = true
