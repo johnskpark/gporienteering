@@ -48,6 +48,21 @@ public class OrienteeringPrimitiveSet extends PrimitiveSet {
     }
 
     /**
+     * Returns the multiobjective terminal set, which is an extension of the extended terminal set.
+     * @return the multiobjective terminal set.
+     */
+    public static OrienteeringPrimitiveSet multiobjectiveTerminalSet() {
+        OrienteeringPrimitiveSet terminalSet = OrienteeringPrimitiveSet.extendedTerminalSet();
+
+        terminalSet.add(new Score2());
+        terminalSet.add(new ScoreMax());
+        terminalSet.add(new ScoreMin());
+        terminalSet.add(new ScoreSum());
+
+        return terminalSet;
+    }
+
+    /**
      * The whole terminal set including all the possible terminals.
      * It is the extended terminal set in this case.
      * @return the whole terminal set.

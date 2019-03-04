@@ -6,10 +6,7 @@
 
 package ec.multiobjective.moead;
 
-import ec.EvolutionState;
-import ec.Individual;
-import ec.Population;
-import ec.Subpopulation;
+import ec.*;
 import ec.simple.SimpleBreeder;
 import ec.util.Parameter;
 
@@ -84,4 +81,5 @@ public class MOEADBreeder extends SimpleBreeder {
         }
         return newPop;
     }
+
 }

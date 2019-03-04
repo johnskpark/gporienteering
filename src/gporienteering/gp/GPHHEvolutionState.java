@@ -43,6 +43,10 @@ public class GPHHEvolutionState extends TerminalERCEvolutionState {
 	 */
 	public static final String P_ROTATE_EVAL_MODEL = "rotate-eval-model";
 
+	public static final String V_TERMINAL_BASIC = "basic";
+	public static final String V_TERMINAL_EXTENDED = "extended";
+	public static final String V_TERMINAL_MULTIOBJECTIVE = "multiobjective";
+
 	protected String terminalFrom;
 	protected boolean includeErc;
 	protected boolean rotateEvalModel;
@@ -125,17 +129,22 @@ public class GPHHEvolutionState extends TerminalERCEvolutionState {
 	 * Initialize the terminal set.
 	 */
 	public void initTerminalSets() {
-		if (terminalFrom.equals("basic")) {
+		if (terminalFrom.equals(V_TERMINAL_BASIC)) {
 			terminalSets = new ArrayList<>();
 
 			for (int i = 0; i < subpops; i++)
 				terminalSets.add(OrienteeringPrimitiveSet.basicTerminalSet());
 		}
-		else if (terminalFrom.equals("extended")) {
+		else if (terminalFrom.equals(V_TERMINAL_EXTENDED)) {
 			terminalSets = new ArrayList<>();
 
 			for (int i = 0; i < subpops; i++)
 				terminalSets.add(OrienteeringPrimitiveSet.extendedTerminalSet());
+		} else if (terminalFrom.equals(V_TERMINAL_MULTIOBJECTIVE)) {
+			terminalSets = new ArrayList<>();
+
+			for (int i = 0; i < subpops; i++)
+				terminalSets.add(OrienteeringPrimitiveSet.multiobjectiveTerminalSet());
 		}
 		else {
 			initTerminalSetsFromCsv(new File(terminalFrom), OrienteeringPrimitiveSet.wholeTerminalSet());

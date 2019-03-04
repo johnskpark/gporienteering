@@ -59,9 +59,9 @@ public class MOEADEvaluator extends SimpleEvaluator {
      * (it's the size of the original population -- keep in mind that MOEADBreeder had made the
      * population larger to include the children.
      */
-    private int originalPopSize[];
+    private int originalPopSizes[];
     private int numObjectives;
-    private Double[][][] popWeightVectors;
+    private double[][][] popWeightVectors;
 
     private int numNeighbours;
     private int[][][] neighbourhood;
@@ -103,9 +103,9 @@ public class MOEADEvaluator extends SimpleEvaluator {
     private void initUniform(final EvolutionState state) {
         Parameter p = new Parameter(Initializer.P_POP);
         int subpopsLength = state.parameters.getInt(p.push(Population.P_SIZE), null, 1);
-        originalPopSize = new int[subpopsLength];
+        originalPopSizes = new int[subpopsLength];
 
-        popWeightVectors = new Double[subpopsLength][][];
+        popWeightVectors = new double[subpopsLength][][];
 
         Parameter m = MultiObjectiveDefaults.base().push(MultiObjectiveFitness.P_FITNESS);
         numObjectives = state.parameters.getInt(m.push(MultiObjectiveFitness.P_NUMOBJECTIVES), null, 2);
@@ -116,13 +116,13 @@ public class MOEADEvaluator extends SimpleEvaluator {
         }
 
         for (int s = 0; s < subpopsLength; s++) {
-            originalPopSize[s] = state.parameters.getInt(p.push(""+s).push(Subpopulation.P_SUBPOPSIZE), null, 1);
+            originalPopSizes[s] = state.parameters.getInt(p.push(""+s).push(Subpopulation.P_SUBPOPSIZE), null, 1);
 
-            popWeightVectors[s] = new Double[originalPopSize[s]][numObjectives];
+            popWeightVectors[s] = new double[originalPopSizes[s]][numObjectives];
 
             /* FIXME make this work with more than two dimensions later down the line. */
-            double partitionSize = 1.0 / (originalPopSize[s] - 1.0);
-            for (int i = 0; i < originalPopSize[s]; i++) {
+            double partitionSize = 1.0 / (originalPopSizes[s] - 1.0);
+            for (int i = 0; i < originalPopSizes[s]; i++) {
                 popWeightVectors[s][i][0] = i * partitionSize;
                 popWeightVectors[s][i][1] = 1.0 - i * partitionSize;
             }
@@ -138,9 +138,9 @@ public class MOEADEvaluator extends SimpleEvaluator {
             for (int i = 0; i < popWeightVectors[s].length; i++) {
                 List<Pair<Integer, Double>> indexDistancePair = new ArrayList<>();
 
-                for (int j = i+1; j < popWeightVectors[s].length; j++) {
-                    Double[] vector1 = popWeightVectors[s][i];
-                    Double[] vector2 = popWeightVectors[s][j];
+                for (int j = i; j < popWeightVectors[s].length; j++) {
+                    double[] vector1 = popWeightVectors[s][i];
+                    double[] vector2 = popWeightVectors[s][j];
 
                     if (vector1.length != vector2.length) {
                         state.output.fatal("Weight vectors at indices " + i + " and " + j + " in subpop " + s + " do not match in lengths.");
@@ -181,19 +181,12 @@ public class MOEADEvaluator extends SimpleEvaluator {
      * Evaluates the population, then builds the archive and reduces the population to just the archive.
      */
     public void evaluatePopulation(final EvolutionState state) {
-        if (state.generation == 0) {
-            for (int s = 0; s < state.population.subpops.length; s++) {
-                assignWeightVectors(state, s);
-            }
-        }
+        int numSubpops = state.population.subpops.length;
 
         super.evaluatePopulation(state);
-
-        for (int s = 0; s < state.population.subpops.length; s++) {
-            assignScalarFitness(state, state.population.subpops[s]);
+        for (int s = 0; s < numSubpops; s++) {
+            state.population.subpops[s].individuals = updatePopulation(state, s);
         }
-
-        // TODO need to update archive
     }
 
     /**
@@ -201,21 +194,31 @@ public class MOEADEvaluator extends SimpleEvaluator {
      * @param state
      * @param subpopIndex
      */
+    // TODO not sure if this is required.
     public void assignWeightVectors(final EvolutionState state, final int subpopIndex) {
         Subpopulation subpop = state.population.subpops[subpopIndex];
+        int subpopSize = subpop.individuals.length;
 
-        List<Integer> indices = new ArrayList<>();
-        for (int i = 0; i < subpop.individuals.length; i++) { indices.add(i); }
-        Collections.shuffle(indices, random);
+//        List<Integer> indices = new ArrayList<>();
+//        for (int i = 0; i < subpopSize; i++) { indices.add(i); }
 
-        for (int i = 0; i < subpop.individuals.length; i++) {
+        for (int i = 0; i < subpopSize; i++) {
             MOEADMultiObjectiveFitness fitness = (MOEADMultiObjectiveFitness) subpop.individuals[i].fitness;
 
-            int randIndex = indices.get(i);
-            Double[] vector = popWeightVectors[subpopIndex][randIndex];
+//            int randIndex = indices.get(i);
+            double[] vector = popWeightVectors[subpopIndex][i];
+            double[] copy = new double[vector.length];
+            System.arraycopy(vector, 0, copy, 0, vector.length);
 
-            fitness.weightVector = Arrays.asList(vector);
+//            fitness.setWeightVector(state, copy, randIndex);
+            fitness.setWeightIndex(state, i);
         }
+
+        // TODO see if this works with the other part, maybe it doesn't.
+//        popWeightAssign[subpopIndex] = new int[subpopSize];
+//        for (int i = 0; i < subpopSize; i++) {
+//            popWeightAssign[subpopIndex][i] = indices.get(i);
+//        }
     }
 
     /**
@@ -223,34 +226,81 @@ public class MOEADEvaluator extends SimpleEvaluator {
      * @param state
      * @param subpop
      */
-    public void assignScalarFitness(final EvolutionState state, final Subpopulation subpop) {
-        for (int i = 0; i < subpop.individuals.length; i++) {
-            MOEADMultiObjectiveFitness fitness = (MOEADMultiObjectiveFitness) subpop.individuals[i].fitness;
-
-            double[] objFitness = fitness.objectives;
-            List<Double> weights = fitness.weightVector;
-
-            if (fitnessMethod.equals(V_WEIGHTED_SUM)) {
-                fitness.scalarFitness = 0;
-                for (int f = 0; f < fitness.getNumObjectives(); f++) {
-                    fitness.scalarFitness += objFitness[f] * weights.get(f);
-                }
-            } else if (fitnessMethod.equals(V_TCHEBYCHEFF)) {
-                state.output.fatal("Tchebycheff fitness decomposition method is not yet implemented"); // FIXME need to implement later down the line.
-            } else {
-                state.output.fatal("Undefined fitness decomposition method: " + fitnessMethod);
-            }
-        }
-    }
+    // TODO not sure if this is required.
+//    public void assignScalarFitness(final EvolutionState state, final Subpopulation subpop) {
+//        for (int i = 0; i < subpop.individuals.length; i++) {
+//            MOEADMultiObjectiveFitness fitness = (MOEADMultiObjectiveFitness) subpop.individuals[i].fitness;
+//
+//            double[] weights = fitness.getWeightVector();
+//
+//            if (fitnessMethod.equals(V_WEIGHTED_SUM)) {
+//                double scalarFitness = 0;
+//                for (int f = 0; f < fitness.getNumObjectives(); f++) {
+//                    scalarFitness += fitness.getObjective(f) * weights[f];
+//                }
+//                fitness.setScalarFitness(state, scalarFitness);
+//            } else if (fitnessMethod.equals(V_TCHEBYCHEFF)) {
+//                state.output.fatal("Tchebycheff fitness decomposition method is not yet implemented"); // FIXME need to implement later down the line.
+//            } else {
+//                state.output.fatal("Undefined fitness decomposition method: " + fitnessMethod);
+//            }
+//        }
+//    }
 
 
     /**
-     * Build the auxiliary scalarFitness data and reduce the subpopulation to just the archive, which is
-     * returned.
+     * Scale the subpopulation down to the original size by updating the parent individuals with the child individuals.
+     * TODO this is broken at the moment.
+     * @param state
+     * @param subpopIndex
      */
-    public Individual[] buildArchive(EvolutionState state, int subpop) {
-        throw new RuntimeException("Not yet implemented.");
-        // TODO do I even need this?
+    public Individual[] updatePopulation(final EvolutionState state, int subpopIndex) {
+        // Only use the child individuals
+        Subpopulation subpop = state.population.subpops[subpopIndex];
+        int popSize = originalPopSizes[subpopIndex];
+
+        Individual[] newInds = new Individual[popSize];
+        System.arraycopy(subpop.individuals, 0, newInds, 0, newInds.length);
+
+        // Replace the parent individuals with the offspring if they dominate them in terms of their respective fitness.
+        for (int i = popSize; i < subpop.individuals.length; i++) {
+            MOEADMultiObjectiveFitness childFitness = (MOEADMultiObjectiveFitness) subpop.individuals[i].fitness;
+
+            int weightIndex = childFitness.getWeightIndex(state);
+            for (int n = 0; n < neighbourhood[subpopIndex][weightIndex].length; n++) {
+                int index = neighbourhood[subpopIndex][weightIndex][n];
+                double[] weightVector = popWeightVectors[subpopIndex][index];
+                MOEADMultiObjectiveFitness parentFitness = (MOEADMultiObjectiveFitness) subpop.individuals[index].fitness;
+
+                childFitness.assignScalarFitness(state, weightVector);
+                parentFitness.assignScalarFitness(state, weightVector);
+                if (childFitness.equivalentTo(parentFitness) || childFitness.betterThan(parentFitness)) {
+                    newInds[index] = (Individual) subpop.individuals[i].clone();
+                }
+            }
+        }
+
+        for (int i = 0; i < popSize; i++) {
+            ((MOEADMultiObjectiveFitness) newInds[i].fitness).setWeightIndex(state, i);
+        }
+
+        return newInds;
     }
+
+//    protected boolean betterOrEqual(MOEADMultiObjectiveFitness fitness1, MOEADMultiObjectiveFitness fitness2, double[] weightVector) {
+//        double scalarFitness1 = 0.0;
+//        double scalarFitness2 = 0.0;
+//
+//        for (int i = 0; i < weightVector.length; i++) {
+//            scalarFitness1 += weightVector[i] * fitness1.getObjective(i);
+//            scalarFitness2 += weightVector[i] * fitness2.getObjective(i);
+//        }
+//
+//        if (scalarFitness1 <= scalarFitness2) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 
 }

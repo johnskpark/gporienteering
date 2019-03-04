@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /*
  * MOEADWeightedSumFitness.java
@@ -37,38 +36,44 @@ import java.util.stream.Collectors;
 // TODO this is just a copy of the NSGA-II scalarFitness file, rewrite later down the line.
 public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
 
-    public static final String MOEAD_RANK_PREAMBLE = "ScalarFitness: ";
-    public static final String MOEAD_SPARSITY_PREAMBLE = "WeightVector: ";
+    public static final String MOEAD_FITNESS_PREAMBLE = "ScalarFitness: ";
+//    public static final String MOEAD_WEIGHT_PREAMBLE = "WeightVector: ";
+    public static final String MOEAD_INDEX_PREAMBLE = "WeightIndex: ";
 
-    public String[] getAuxilliaryFitnessNames() { return new String[] { "ScalarFitness" }; }
-    public double[] getAuxilliaryFitnessValues() { return new double[] {scalarFitness}; }
+    public String[] getAuxilliaryFitnessNames() { return new String[] { "ScalarFitness", "WeightVectorIndex" }; }
+    public double[] getAuxilliaryFitnessValues() { return new double[] { scalarFitness, weightIndex }; }
 
     // Scalar scalarFitness calculated from the weight vector.
-    public double scalarFitness;
+    private double scalarFitness;
 
     // The weight vector assigned to the individual.
-    public List<Double> weightVector;
+//    private double[] weightVector;
+    private int weightIndex;
 
     public String fitnessToString() {
-        return super.fitnessToString() + "\n" + MOEAD_RANK_PREAMBLE + Code.encode(scalarFitness) + "\n" + MOEAD_SPARSITY_PREAMBLE + Code.encode(weightVector.toString());
+//        return super.fitnessToString() + "\n" + MOEAD_INDEX_PREAMBLE + Code.encode(weightIndex);
+        return super.fitnessToString() + "\n" + MOEAD_FITNESS_PREAMBLE + Code.encode(scalarFitness) + "\n" + MOEAD_INDEX_PREAMBLE + Code.encode(weightIndex);
     }
 
     public String fitnessToStringForHumans() {
-        return super.fitnessToStringForHumans() + "\n" + MOEAD_RANK_PREAMBLE + scalarFitness + "\n" + MOEAD_SPARSITY_PREAMBLE + weightVector.toString();
+//        return super.fitnessToStringForHumans() + "\n" + MOEAD_INDEX_PREAMBLE + weightIndex;
+        return super.fitnessToStringForHumans() + "\n" + MOEAD_FITNESS_PREAMBLE + scalarFitness + "\n" + MOEAD_INDEX_PREAMBLE + weightIndex;
     }
 
     public void readFitness(final EvolutionState state, final LineNumberReader reader) throws IOException {
         super.readFitness(state, reader);
-        scalarFitness = Code.readDoubleWithPreamble(MOEAD_RANK_PREAMBLE, state, reader);
-
-        String weightsStr = Code.readStringWithPreamble(MOEAD_SPARSITY_PREAMBLE, state, reader);
-        weightVector = convertWeightStr(weightsStr);
+        scalarFitness = Code.readDoubleWithPreamble(MOEAD_FITNESS_PREAMBLE, state, reader);
+//
+//        String weightsStr = Code.readStringWithPreamble(MOEAD_WEIGHT_PREAMBLE, state, reader);
+//        weightVector = convertWeightStr(weightsStr);
+        weightIndex = Code.readIntegerWithPreamble(MOEAD_INDEX_PREAMBLE, state, reader);
     }
 
     public void writeFitness(final EvolutionState state, final DataOutput dataOutput) throws IOException {
         super.writeFitness(state, dataOutput);
         dataOutput.writeDouble(scalarFitness);
-        dataOutput.writeChars(weightVector.toString());
+//        dataOutput.writeChars(weightVector.toString());
+        dataOutput.writeInt(weightIndex);
         writeTrials(state, dataOutput);
     }
 
@@ -76,22 +81,60 @@ public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
         super.readFitness(state, dataInput);
 
         scalarFitness = dataInput.readDouble();
-
-        String weightsStr = "";
-        char nextChar;
-        while ((nextChar = dataInput.readChar()) != ']') {
-            weightsStr += nextChar;
-        }
-        weightVector = convertWeightStr(weightsStr);
+//
+//        String weightsStr = "";
+//        char nextChar;
+//        while ((nextChar = dataInput.readChar()) != ']') {
+//            weightsStr += nextChar;
+//        }
+//        weightVector = convertWeightStr(weightsStr);
+        weightIndex = dataInput.readInt();
 
         readTrials(state, dataInput);
     }
 
-    private List<Double> convertWeightStr(String weightsStr) {
-        weightsStr = weightsStr.replaceAll("[\\[\\] ]", "");
-        List<String> split = Arrays.asList(weightsStr.split(","));
+//    private double[] convertWeightStr(String weightsStr) {
+//        weightsStr = weightsStr.replaceAll("[\\[\\] ]", "");
+//        List<String> split = Arrays.asList(weightsStr.split(","));
+//
+//        double[] vector = new double[split.size()];
+//        for (int i = 0; i < split.size(); i++) {
+//            vector[i] = Double.parseDouble(split.get(i));
+//        }
+//
+//        return vector;
+//    }
 
-        return split.stream().map(x -> Double.parseDouble(x)).collect(Collectors.toList());
+    public double getScalarFitness() {
+        return scalarFitness;
+    }
+
+//    public double[] getWeightVector() {
+//        return weightVector;
+//    }
+
+    public int getWeightIndex(final EvolutionState state) {
+        return weightIndex;
+    }
+
+//    public void setScalarFitness(final EvolutionState state, double scalarFitness) {
+//        this.scalarFitness = scalarFitness;
+//    }
+//
+//    public void setWeightVector(final EvolutionState state, double[] weightVector, int weightIndex) {
+//        this.weightVector = weightVector;
+//        this.weightIndex = weightIndex;
+//    }
+
+    public void assignScalarFitness(final EvolutionState state, double[] weightVector) {
+        scalarFitness = 0.0;
+        for (int i = 0; i < getNumObjectives(); i++) {
+            scalarFitness += getObjective(i) * weightVector[i];
+        }
+    }
+
+    public void setWeightIndex(final EvolutionState state, int weightIndex) {
+        this.weightIndex = weightIndex;
     }
 
     /* FIXME Test against the actual algorithm */
@@ -114,5 +157,16 @@ public class MOEADMultiObjectiveFitness extends MultiObjectiveFitness {
         } else {
             return false;
         }
+    }
+
+    /* FIXME test to make sure that cloning is done properly. */
+    @Override
+    public Object clone() {
+        MOEADMultiObjectiveFitness clone = (MOEADMultiObjectiveFitness) super.clone();
+        clone.scalarFitness = this.scalarFitness;
+//        clone.weightVector = new double[this.weightVector.length];
+//        System.arraycopy(this.weightVector, 0, clone.weightVector, 0, this.weightVector.length);
+        clone.weightIndex = this.weightIndex;
+        return clone;
     }
 }
