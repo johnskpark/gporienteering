@@ -17,10 +17,10 @@ checkpoint-prefix = ec
 state = gporienteering.gp.GPHHEvolutionState
 finish = ec.simple.SimpleFinisher
 exch = ec.simple.SimpleExchanger
-breed =	ec.simple.SimpleBreeder
-eval = ec.simple.SimpleEvaluator
-stat = ec.simple.SimpleStatistics
-stat.file = $job.0.out.stat
+#breed = ec.simple.SimpleBreeder
+#eval = ec.simple.SimpleEvaluator
+#stat = ec.simple.MultiObjectiveStatistics
+#stat.file = $job.0.out.stat
 #stat.num-children = 1
 #stat.child.0 = ec.gp.koza.KozaShortStatistics
 #stat.child.0.file = $outtabular.stat
@@ -33,8 +33,17 @@ pop.subpops = 1
 pop.subpop.0 = ec.Subpopulation
 pop.subpop.0.size =	1024
 
-breed.elite.0 = 10
+breed.elite.0 = 0
 
+# ==============================
+# Multiobjective parameters
+# ==============================
+multi.fitness.num-objectives = 2
+multi.fitness.max = 1
+multi.fitness.min = 0
+stat = ec.multiobjective.MultiObjectiveStatistics
+stat.file = $job.0.out.stat
+stat.front = $job.0.front.stat
 
 # ==============================
 # GP general parameters
@@ -86,7 +95,7 @@ gp.koza.mutate.maxdepth = 8
 gp.koza.mutate.tries = 1
 
 # Tournament selection, for reproduction, crossover and mutation
-select.tournament.size = 7
+select.tournament.size = 2
 
 # Koza grow parameters, for mutation
 gp.koza.grow.min-depth = 4
@@ -222,13 +231,29 @@ eval.problem.eval-model = gporienteering.gp.evaluation.MOTOPTWEvaluationModel
 eval.problem.eval-model.objectives = 2
 eval.problem.eval-model.objectives.0 = total-score
 eval.problem.eval-model.objectives.1 = total-score-2
-eval.problem.eval-model.instances = 1
+
+eval.problem.eval-model.instances = 3
+
 eval.problem.eval-model.instances.0.dataset = c_r_rc_200_100
 eval.problem.eval-model.instances.0.file-name = mor204
-eval.problem.eval-model.instances.0.samples = 1
+eval.problem.eval-model.instances.0.samples = 3
 eval.problem.eval-model.instances.0.days = 3
 eval.problem.eval-model.instances.0.time-ulevel = 0
 eval.problem.eval-model.instances.0.duration-ulevel = 0.2
+
+eval.problem.eval-model.instances.1.dataset = c_r_rc_200_100
+eval.problem.eval-model.instances.1.file-name = mor204
+eval.problem.eval-model.instances.1.samples = 3
+eval.problem.eval-model.instances.1.days = 3
+eval.problem.eval-model.instances.1.time-ulevel = 0
+eval.problem.eval-model.instances.1.duration-ulevel = 0.2
+
+eval.problem.eval-model.instances.2.dataset = c_r_rc_200_100
+eval.problem.eval-model.instances.2.file-name = morc204
+eval.problem.eval-model.instances.2.samples = 3
+eval.problem.eval-model.instances.2.days = 3
+eval.problem.eval-model.instances.2.time-ulevel = 0
+eval.problem.eval-model.instances.2.duration-ulevel = 0.2
 
 # ==============================
 # The GPHH evolution state parameters
