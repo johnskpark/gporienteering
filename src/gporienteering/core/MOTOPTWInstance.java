@@ -13,8 +13,6 @@ import java.util.Map;
 /**
  * The multi-objective team orienteering problem with time windows.
  */
-
-// TODO need to fix this to be multi-objective as well.
 public class MOTOPTWInstance extends Instance {
 
     private int numObjs;

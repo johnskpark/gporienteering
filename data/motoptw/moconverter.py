@@ -24,18 +24,20 @@ input_f = open(rule_file, "r")
 # Dump the entire file into a string
 string_dump = []
 for line in input_f:
-    string_dump.append(re.sub("\n", "", line))
+    trim_line = re.sub("\n", "", line).rstrip()
+    string_dump.append(trim_line)
 
 input_f.close()
 
 split_results = []
 scores = []
 for i in range(2, len(string_dump)):
-    line = string_dump[i].rstrip()
+    line = string_dump[i]
+    
     # if line is white space only, then ignore
     if len(line)==0:
         continue
-    split = line.split(" ")
+    split = re.split("[\s]+", line)
     split_results.append(split)
     scores.append(split[5])
     
