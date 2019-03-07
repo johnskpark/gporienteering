@@ -13,6 +13,10 @@ pop.subpop.0.species.fitness =				ec.multiobjective.moead.MOEADMultiObjectiveFit
 
 # We have our own evaluator and breeder
 eval =						ec.multiobjective.moead.MOEADEvaluator
+eval.weight-distribution =	uniform
+eval.num-neighbours = 		3
+eval.scalar-fitness = 		weighted-sum
+
 breed =						ec.multiobjective.moead.MOEADBreeder
 
 # Specify the breeding pipeline as follows

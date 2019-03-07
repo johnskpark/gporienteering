@@ -5,5 +5,13 @@ parent.0 = train.params
 
 pop.subpop.0.species.fitness = ec.multiobjective.moead.MOEADMultiObjectiveFitness
 
-eval = ec.multiobjective.moead.MOEADEvaluator
-breed = ec.multiobjective.moead.MOEADBreeder
+eval =                      ec.multiobjective.moead.MOEADEvaluator
+eval.weight-distribution =  uniform
+eval.num-neighbours =       3
+eval.scalar-fitness =       weighted-sum
+
+breed =                     ec.multiobjective.moead.MOEADBreeder
+
+breed.reproduce.source.0 = 	ec.multiobjective.moead.MOEADRandomSelection
+gp.koza.xover.source.0 = 	ec.multiobjective.moead.MOEADRandomSelection
+gp.koza.mutate.source.0 = 	ec.multiobjective.moead.MOEADRandomSelection
