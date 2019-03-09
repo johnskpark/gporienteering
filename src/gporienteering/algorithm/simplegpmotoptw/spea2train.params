@@ -5,5 +5,12 @@ parent.0 = train.params
 
 pop.subpop.0.species.fitness = ec.multiobjective.spea2.SPEA2MultiObjectiveFitness
 
-eval = ec.multiobjective.spea2.SPEA2Evaluator
-breed = ec.multiobjective.spea2.SPEA2Breeder
+eval =          ec.multiobjective.spea2.SPEA2Evaluator
+
+breed =         ec.multiobjective.spea2.SPEA2Breeder
+breed.elite.0 = 128
+
+breed.reproduce.source.0 = 	ec.multiobjective.spea2.SPEA2TournamentSelection
+gp.koza.xover.source.0 = 	ec.multiobjective.spea2.SPEA2TournamentSelection
+gp.koza.xover.source.1 =    same
+gp.koza.mutate.source.0 = 	ec.multiobjective.spea2.SPEA2TournamentSelection

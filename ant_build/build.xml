@@ -1,0 +1,40 @@
+<!-- Builds the gporienteering.jar files -->
+<project>
+
+    <property name="src.dir" value="../src" />
+    <property name="bin.dir" value="../bin" />
+    <property name="jar.dir" value="../output_jars" />
+    <property name="lib.dir" value="../libraries" />
+
+    <property name="eval_xsd.src" value="../src/app/evaluation" />
+    <property name="eval_xsd.bin" value="../bin/app/evaluation" />
+
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar" />
+    </path>
+
+    <target name="clean">
+        <delete dir="${bin.dir}" />
+        <delete dir="${jar.dir}" />
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${bin.dir}" />
+        <!-- Compile the .java files -->
+        <javac srcdir="${src.dir}" destdir="${bin.dir}" classpathref="classpath" debug="true" />
+    </target>
+
+    <target name="jar">
+        <mkdir dir="${jar.dir}" />
+
+        <!-- Write the gporienteering.jar jar file -->
+        <jar destfile="${jar.dir}/gporienteering.jar" basedir="${bin.dir}" >
+            <manifest>
+                <attribute name="Manifest-Version" value="1.0" />
+                <attribute name="Main-Class" value="ec.Evolve" />
+                <attribute name="Class-Path" value="commons-lang3-3.4.jar commons-math3-3.5.jar EJML-core-0.27.jar EJML-dense64-0.27.jar EJML-simple-0.27.jar itext-1.2.jar jcommon-1.0.16.jar jfreechart-1.0.13.jar jzlib-1.0.7.jar pshecj.jar" />
+            </manifest>
+        </jar>
+    </target>
+
+</project>

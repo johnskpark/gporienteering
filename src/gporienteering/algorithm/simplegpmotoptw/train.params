@@ -234,30 +234,17 @@ eval.problem.eval-model.objectives.1 = total-score-2
 
 eval.problem.eval-model.instances = 1
 
-eval.problem.eval-model.instances.0.dataset = c_r_rc_100_50
-eval.problem.eval-model.instances.0.file-name = mo50_c101
+eval.problem.eval-model.instances.0.dataset = pr
+eval.problem.eval-model.instances.0.file-name = mopr20
 eval.problem.eval-model.instances.0.samples = 1
 eval.problem.eval-model.instances.0.days = 3
 eval.problem.eval-model.instances.0.time-ulevel = 0
 eval.problem.eval-model.instances.0.duration-ulevel = 0.2
 
-#eval.problem.eval-model.instances.0.dataset = c_r_rc_100_100
-#eval.problem.eval-model.instances.0.file-name = moc101
-#eval.problem.eval-model.instances.0.samples = 1
-#eval.problem.eval-model.instances.0.days = 3
-#eval.problem.eval-model.instances.0.time-ulevel = 0
-#eval.problem.eval-model.instances.0.duration-ulevel = 0.2
-
-#eval.problem.#eval-model.instances.0.dataset = c_r_rc_200_100
-#eval.problem.#eval-model.instances.0.file-name = moc202
-#eval.problem.#eval-model.instances.0.samples = 1
-#eval.problem.#eval-model.instances.0.days = 3
-#eval.problem.#eval-model.instances.0.time-ulevel = 0
-#eval.problem.#eval-model.instances.0.duration-ulevel = 0.2
-
 # ==============================
 # The GPHH evolution state parameters
 # ==============================
+#terminals-from = extended
 terminals-from = multiobjective
 include-erc = true
 rotate-eval-model = true
