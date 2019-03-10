@@ -4,12 +4,13 @@
 policy-type = gp-evolved
 
 # for manual policies
-manual-policies = 2
-manual-policies.0 = gporienteering.decisionprocess.policy.ScoreOverTimePolicy
-manual-policies.1 = gporienteering.decisionprocess.policy.ScoreOverSlackPolicy
+manual-policies = 0
+#manual-policies.0 = gporienteering.decisionprocess.policy.ScoreOverTimePolicy
+#manual-policies.1 = gporienteering.decisionprocess.policy.ScoreOverSlackPolicy
 
 # for gp-evolved policies
-train-path = /Users/yimei/Dropbox/GPOrienteering/ # TODO this needs to be fixed.
+# This train-path needs to be set for each GP approach.
+train-path = /home/parkjohn/phd_research/orienteering_rules/
 solution-type = simple-solution
 fitness-type = simple-fitness
 num-trains = 1
