@@ -10,7 +10,8 @@ import java.util.Map;
 
 public enum SolutionType {
 
-    SIMPLE_SOLUTION("simple-solution");
+    SIMPLE_SOLUTION("simple-solution"),
+    MULTIOBJECTIVE_SOLUTION("multiobjective-solution");
 
     private final String name;
 

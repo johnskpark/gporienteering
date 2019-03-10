@@ -10,6 +10,7 @@ import java.util.Map;
 
 public enum FitnessType {
     SIMPLE_FITNESS("simple-fitness"),
+    MULTIOBJECTIVE_FITNESS("multiobjective-fitness"),
     DIMENSION_AWARE_FITNESS("dimension-aware-fitness");
 
     private final String name;

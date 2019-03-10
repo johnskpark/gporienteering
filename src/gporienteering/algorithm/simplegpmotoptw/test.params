@@ -11,8 +11,8 @@ manual-policies = 0
 # for gp-evolved policies
 # This train-path needs to be set for each GP approach.
 train-path = /home/parkjohn/phd_research/orienteering_rules/
-solution-type = simple-solution
-fitness-type = simple-fitness
+solution-type = multiobjective-solution
+fitness-type = multiobjective-fitness
 num-trains = 1
 
 # ==============================
@@ -30,7 +30,7 @@ eval.problem.eval-model.objectives.0 = total-score
 eval.problem.eval-model.objectives.1 = total-score-2
 eval.problem.eval-model.instances = 1
 eval.problem.eval-model.instances.0.dataset = c_r_rc_200_100
-eval.problem.eval-model.instances.0.file-name = r204
+eval.problem.eval-model.instances.0.file-name = mor204
 eval.problem.eval-model.instances.0.samples = 500
 eval.problem.eval-model.instances.0.days = 3
 eval.problem.eval-model.instances.0.time-ulevel = 0
@@ -70,10 +70,10 @@ checkpoint-prefix = ec
 state = gporienteering.gp.GPHHEvolutionState
 finish = ec.simple.SimpleFinisher
 exch = ec.simple.SimpleExchanger
-breed =	ec.simple.SimpleBreeder
-eval = ec.simple.SimpleEvaluator
-stat = ec.simple.SimpleStatistics
-stat.file = $out.stat
+#breed = ec.simple.SimpleBreeder
+#eval = ec.simple.SimpleEvaluator
+#stat = ec.simple.SimpleStatistics
+#stat.file = $out.stat
 #stat.num-children = 1
 #stat.child.0 = ec.gp.koza.KozaShortStatistics
 #stat.child.0.file = $outtabular.stat
@@ -86,7 +86,17 @@ pop.subpops = 1
 pop.subpop.0 = ec.Subpopulation
 pop.subpop.0.size =	1024
 
-breed.elite.0 = 10
+breed.elite.0 = 0
+
+# ==============================
+# Multiobjective parameters
+# ==============================
+multi.fitness.num-objectives = 2
+multi.fitness.max = 1
+multi.fitness.min = 0
+stat = ec.multiobjective.MultiObjectiveStatistics
+stat.file = $out.stat
+stat.front = $front.stat
 
 
 # ==============================

@@ -68,7 +68,7 @@ public class OrienteeringPrimitiveSet extends PrimitiveSet {
      * @return the whole terminal set.
      */
     public static OrienteeringPrimitiveSet wholeTerminalSet() {
-        return extendedTerminalSet();
+        return multiobjectiveTerminalSet();
     }
 
     /**
