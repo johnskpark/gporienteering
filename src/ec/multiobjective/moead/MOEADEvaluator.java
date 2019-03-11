@@ -184,7 +184,7 @@ public class MOEADEvaluator extends SimpleEvaluator {
         for (int i = 0; i < subpopSize; i++) {
             MOEADMultiObjectiveFitness fitness = (MOEADMultiObjectiveFitness) subpop.individuals[i].fitness;
 
-            fitness.setWeightIndex(state, i);
+            fitness.setWeightIndex(state, popWeightVectors[subpopIndex][i], i);
         }
     }
 
@@ -221,7 +221,7 @@ public class MOEADEvaluator extends SimpleEvaluator {
         }
         
         for (int i = 0; i < subpopSize; i++) {
-            ((MOEADMultiObjectiveFitness) newInds[i].fitness).setWeightIndex(state, i);
+            ((MOEADMultiObjectiveFitness) newInds[i].fitness).setWeightIndex(state, popWeightVectors[subpopIndex][i], i);
         }
 
         return newInds;

@@ -57,11 +57,14 @@ public class MOEADBreeder extends SimpleBreeder {
 		
 		breedIndices = new int[subpopLength];
 		Population newPop = super.breedPopulation(state);
+		MOEADEvaluator eval = (MOEADEvaluator) state.evaluator;
 		for (int i = 0; i < subpopLength; i++) {
 			Individual[] newInds = newPop.subpops[i].individuals;
 			for (int j = 0; j < newInds.length; j++) {
 				MOEADMultiObjectiveFitness fitness = (MOEADMultiObjectiveFitness) newInds[j].fitness;
-				fitness.setWeightIndex(state, indWeightIndices[i][j]);
+				
+				int index = indWeightIndices[i][j];
+				fitness.setWeightIndex(state, eval.getMOEADWeights()[i][index], index);
 			}
 		}
 

@@ -16,7 +16,8 @@ public class ScoreWeightedSum extends FeatureGPNode {
 
     @Override
     public double value(CalcPriorityProblem calcPriorityProblem) {
-        // TODO this code doesn't work. 
+        // TODO this code doesn't work. Because you don't have the evaluator or the individual. 
+    	// Also, the GP tree in evaluation doesn't contain the individual either, so I'm not sure how this will work at all. 
 //        MOEADEvaluator evaluator = (MOEADEvaluator) state.evaluator;
 //        MOEADMultiObjectiveFitness fitness = (MOEADMultiObjectiveFitness) individual.fitness;
 
