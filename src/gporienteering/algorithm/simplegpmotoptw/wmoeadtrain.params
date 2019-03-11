@@ -1,5 +1,5 @@
 
-# The NSGA-II training procedure for the GP approach.
+# The MOEAD training procedure for the GP approach.
 
 parent.0 = train.params
 
@@ -17,4 +17,5 @@ gp.koza.xover.source.0 = 	ec.multiobjective.moead.MOEADRandomSelection
 gp.koza.xover.source.1 =    same
 gp.koza.mutate.source.0 = 	ec.multiobjective.moead.MOEADRandomSelection
 
-terminals-from = extendedMO
+# Includes the weighted score sum used by extended multi-objective terminal set.
+terminals-from = extended-mo

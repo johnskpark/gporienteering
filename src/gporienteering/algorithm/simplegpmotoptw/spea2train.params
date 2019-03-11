@@ -1,5 +1,5 @@
 
-# The NSGA-II training procedure for the GP approach.
+# The SPEA2 training procedure for the GP approach.
 
 parent.0 = train.params
 
