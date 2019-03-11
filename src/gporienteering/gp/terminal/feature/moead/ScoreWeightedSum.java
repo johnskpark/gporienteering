@@ -16,14 +16,16 @@ public class ScoreWeightedSum extends FeatureGPNode {
 
     @Override
     public double value(CalcPriorityProblem calcPriorityProblem) {
-        MOEADEvaluator evaluator = (MOEADEvaluator) state.evaluator;
-        MOEADMultiObjectiveFitness fitness = (MOEADMultiObjectiveFitness) individual.fitness;
+        // TODO this code doesn't work. 
+//        MOEADEvaluator evaluator = (MOEADEvaluator) state.evaluator;
+//        MOEADMultiObjectiveFitness fitness = (MOEADMultiObjectiveFitness) individual.fitness;
 
-        double[][][] allWeights = evaluator.getMOEADWeights();
-        int weightIndex = fitness.getWeightIndex(state);
+//        double[][][] allWeights = evaluator.getMOEADWeights();
+//        int weightIndex = fitness.getWeightIndex(state);
 
         double[] scores = calcPriorityProblem.getCandidate().getScores();
-        double[] weights = allWeights[0][weightIndex];
+//        double[] weights = allWeights[0][weightIndex];
+        double[] weights = new double[scores.length];
 
         double sum = scores[0] * weights[0];
         for (int i = 1; i < scores.length; i++) {

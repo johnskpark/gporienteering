@@ -17,9 +17,6 @@ import gputils.DoubleData;
 public abstract class FeatureGPNode extends GPNode {
     protected String name;
 
-    protected EvolutionState state;
-    protected GPIndividual individual;
-
     public FeatureGPNode() {
         super();
         children = new GPNode[0];
@@ -44,9 +41,6 @@ public abstract class FeatureGPNode extends GPNode {
                      ADFStack stack, GPIndividual individual, Problem problem) {
         // The problem is essentially a priority calculation.
         CalcPriorityProblem calcPrioProb = ((CalcPriorityProblem)problem);
-
-        this.state = state;
-        this.individual = individual;
 
         DoubleData data = ((DoubleData)input);
         data.value = value(calcPrioProb);
