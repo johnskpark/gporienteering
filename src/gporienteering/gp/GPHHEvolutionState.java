@@ -46,6 +46,7 @@ public class GPHHEvolutionState extends TerminalERCEvolutionState {
 	public static final String V_TERMINAL_BASIC = "basic";
 	public static final String V_TERMINAL_EXTENDED = "extended";
 	public static final String V_TERMINAL_MULTIOBJECTIVE = "multiobjective";
+	public static final String V_TERMINAL_EXTENDED_MO = "extended-mo";
 
 	protected String terminalFrom;
 	protected boolean includeErc;
@@ -132,21 +133,29 @@ public class GPHHEvolutionState extends TerminalERCEvolutionState {
 		if (terminalFrom.equals(V_TERMINAL_BASIC)) {
 			terminalSets = new ArrayList<>();
 
-			for (int i = 0; i < subpops; i++)
+			for (int i = 0; i < subpops; i++) {
 				terminalSets.add(OrienteeringPrimitiveSet.basicTerminalSet());
+			}
 		}
 		else if (terminalFrom.equals(V_TERMINAL_EXTENDED)) {
 			terminalSets = new ArrayList<>();
 
-			for (int i = 0; i < subpops; i++)
+			for (int i = 0; i < subpops; i++) {
 				terminalSets.add(OrienteeringPrimitiveSet.extendedTerminalSet());
+			}
 		} else if (terminalFrom.equals(V_TERMINAL_MULTIOBJECTIVE)) {
 			terminalSets = new ArrayList<>();
 
-			for (int i = 0; i < subpops; i++)
+			for (int i = 0; i < subpops; i++) {
 				terminalSets.add(OrienteeringPrimitiveSet.multiobjectiveTerminalSet());
-		}
-		else {
+			}
+		} else if (terminalFrom.equals(V_TERMINAL_EXTENDED_MO)) {
+			terminalSets = new ArrayList<>();
+
+			for (int i = 0; i < subpops; i++) {
+				terminalSets.add(OrienteeringPrimitiveSet.extendedMOTerminalSet());
+			}
+		} else {
 			initTerminalSetsFromCsv(new File(terminalFrom), OrienteeringPrimitiveSet.wholeTerminalSet());
 		}
 

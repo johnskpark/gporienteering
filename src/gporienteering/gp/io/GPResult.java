@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,10 +35,10 @@ public class GPResult {
 	private List<Policy> solutions;
 	private List<Fitness> trainFitnesses;
 	private List<Fitness> testFitnesses;
-	private String bestExpression;
-	private Policy bestSolution;
-	private Fitness bestTrainFitness;
-	private Fitness bestTestFitness;
+	private List<String> bestExpression;
+	private List<Policy> bestSolution;
+	private List<Fitness> bestTrainFitness;
+	private List<Fitness> bestTestFitness;
 	private DescriptiveStatistics timeStat;
 
 	public GPResult() {
@@ -79,35 +80,35 @@ public class GPResult {
 		this.testFitnesses = testFitnesses;
 	}
 
-	public String getBestExpression() {
+	public List<String> getBestExpression() {
 		return bestExpression;
 	}
 
-	public void setBestExpression(String bestExpression) {
+	public void setBestExpression(List<String> bestExpression) {
 		this.bestExpression = bestExpression;
 	}
 
-	public Policy getBestSolution() {
+	public List<Policy> getBestSolution() {
 		return bestSolution;
 	}
 
-	public void setBestSolution(Policy bestSolution) {
+	public void setBestSolution(List<Policy> bestSolution) {
 		this.bestSolution = bestSolution;
 	}
 
-	public Fitness getBestTrainFitness() {
+	public List<Fitness> getBestTrainFitness() {
 		return bestTrainFitness;
 	}
 
-	public void setBestTrainFitness(Fitness bestTrainFitness) {
+	public void setBestTrainFitness(List<Fitness> bestTrainFitness) {
 		this.bestTrainFitness = bestTrainFitness;
 	}
 
-	public Fitness getBestTestFitness() {
+	public List<Fitness> getBestTestFitness() {
 		return bestTestFitness;
 	}
 
-	public void setBestTestFitness(Fitness bestTestFitness) {
+	public void setBestTestFitness(List<Fitness> bestTestFitness) {
 		this.bestTestFitness = bestTestFitness;
 	}
 
@@ -208,10 +209,10 @@ public class GPResult {
 		}
 
 		// Set the best solution as the solution in the last generation
-		result.setBestExpression(expression);
-		result.setBestSolution(solution);
-		result.setBestTrainFitness(fitness);
-		result.setBestTestFitness((Fitness)fitness.clone());
+		result.setBestExpression(Arrays.asList(new String[] { expression }));
+		result.setBestSolution(Arrays.asList(new Policy[] { solution }));
+		result.setBestTrainFitness(Arrays.asList(new Fitness[] { fitness }));
+		result.setBestTestFitness(Arrays.asList(new Fitness[] { (Fitness)fitness.clone() }));
 
 		return result;
 	}
@@ -223,6 +224,11 @@ public class GPResult {
 		ReactiveGPHHProblem prob = (ReactiveGPHHProblem)problem;
 
 		GPResult result = new GPResult();
+
+		List<String> expressions = new ArrayList<String>();
+		List<Policy> routingPolicies = new ArrayList<Policy>();
+		List<Fitness> trainFitnesses = new ArrayList<Fitness>();
+		List<Fitness> testFitnesses = new ArrayList<Fitness>();
 
 		String line;
 		Fitness fitness = null;
@@ -250,16 +256,16 @@ public class GPResult {
 				expression = br.readLine();
 
 				expression = LispUtils.simplifyExpression(expression);
-				result.addExpression(expression);
+				expressions.add(expression);
 
 				Policy routingPolicy =
 						new GPPolicy(prob.getPoolFilter(),
 								LispUtils.parseExpression(expression,
 										OrienteeringPrimitiveSet.wholePrimitiveSet()));
 
-				result.addSolution(routingPolicy);
-				result.addTrainFitness(fitness);
-				result.addTestFitness((Fitness)fitness.clone());
+				routingPolicies.add(routingPolicy);
+				trainFitnesses.add(fitness);
+				testFitnesses.add((Fitness)fitness.clone());
 
 				solution = routingPolicy;
 			}
@@ -268,10 +274,10 @@ public class GPResult {
 		}
 
 		// Set the best solution as the solution in the last generation
-		result.setBestExpression(expression);
-		result.setBestSolution(solution);
-		result.setBestTrainFitness(fitness);
-		result.setBestTestFitness((Fitness)fitness.clone());
+		result.setBestExpression(expressions);
+		result.setBestSolution(routingPolicies);
+		result.setBestTrainFitness(trainFitnesses);
+		result.setBestTestFitness(testFitnesses);
 
 		return result;
 	}

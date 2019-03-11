@@ -1,6 +1,7 @@
 package gporienteering.gp;
 
 import gporienteering.gp.terminal.feature.*;
+import gporienteering.gp.terminal.feature.moead.ScoreWeightedSum;
 import gputils.function.*;
 import gputils.terminal.PrimitiveSet;
 
@@ -62,13 +63,21 @@ public class OrienteeringPrimitiveSet extends PrimitiveSet {
         return terminalSet;
     }
 
+    public static OrienteeringPrimitiveSet extendedMOTerminalSet() {
+        OrienteeringPrimitiveSet terminalSet = OrienteeringPrimitiveSet.multiobjectiveTerminalSet();
+
+        terminalSet.add(new ScoreWeightedSum());
+
+        return terminalSet;
+    }
+
     /**
      * The whole terminal set including all the possible terminals.
      * It is the extended terminal set in this case.
      * @return the whole terminal set.
      */
     public static OrienteeringPrimitiveSet wholeTerminalSet() {
-        return multiobjectiveTerminalSet();
+        return extendedMOTerminalSet();
     }
 
     /**

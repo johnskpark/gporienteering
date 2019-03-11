@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -98,19 +99,39 @@ public class GPTest {
                 // test the rules for each generation
                 long start = System.currentTimeMillis();
 
-                for (int j = 0; j < result.getSolutions().size(); j++) {
-                    testEvaluationModel.evaluateOriginal(result.getSolutionAtGen(j),
-                            result.getTestFitnessAtGen(j), state);
+                switch (solutionType) {
+                    case SIMPLE_SOLUTION:
+                        for (int j = 0; j < result.getSolutions().size(); j++) {
+                            testEvaluationModel.evaluateOriginal(result.getSolutionAtGen(j),
+                                    result.getTestFitnessAtGen(j), state);
 
-                    System.out.println("Generation " + j + ": test fitness = " +
-                            result.getTestFitnessAtGen(j).fitness());
+                            System.out.println("Generation " + j + ": test fitness = " +
+                                    result.getTestFitnessAtGen(j).fitness());
+                        }
+
+                        // test the best rule
+                        testEvaluationModel.evaluateOriginal(result.getBestSolution().get(0),
+                                result.getBestTestFitness().get(0), state);
+                        System.out.println("Best indi: test fitness = " +
+                                result.getBestTestFitness().get(0).fitness());
+                        break;
+                    case MULTIOBJECTIVE_SOLUTION:
+                        // test the Pareto Front
+                        List<Policy> bestSolutions = result.getBestSolution();
+                        List<Fitness> bestTestFitnesses = result.getBestTestFitness();
+
+                        for (int j = 0; j < bestSolutions.size(); j++) {
+                            testEvaluationModel.evaluateOriginal(bestSolutions.get(j),
+                                    bestTestFitnesses.get(j), state);
+
+                            System.out.println("Pareto individual " + j + ": test fitness = " +
+                                    bestTestFitnesses.get(j).fitness());
+                        }
+                        break;
+                    default:
+                        System.err.println("Unknown solution type: " + solutionType.toString());
+                        System.exit(1);
                 }
-
-                // test the best rule
-                testEvaluationModel.evaluateOriginal(result.getBestSolution(),
-                        result.getBestTestFitness(), state);
-                System.out.println("Best indi: test fitness = " +
-                        result.getBestTestFitness().fitness());
 
                 long finish = System.currentTimeMillis();
                 long duration = finish - start;
@@ -139,10 +160,10 @@ public class GPTest {
                     // used to calculate the number of unique terminals
                     UniqueTerminalsGatherer gatherer = new UniqueTerminalsGatherer();
 
+                    GPPolicy solution1;
+                    int numUniqueTerminals;
                     switch (solutionType) {
                         case SIMPLE_SOLUTION:
-                            GPPolicy solution1;
-                            int numUniqueTerminals;
                             // write the test results for each generation
                             for (int j = 0; j < result.getSolutions().size(); j++) {
                                 solution1 = (GPPolicy) result.getSolutionAtGen(j);
@@ -165,6 +186,20 @@ public class GPTest {
                                     numUniqueTerminals + "," + fitnessString(result, -1, fitnessType) +
                                     "0");
                             writer.newLine();
+                            break;
+                        case MULTIOBJECTIVE_SOLUTION:
+                            List<Policy> bestSolutions = result.getBestSolution();
+                            for (int j = 0; j < bestSolutions.size(); j++) {
+                                solution1 = (GPPolicy) bestSolutions.get(j);
+
+                                numUniqueTerminals = solution1.getGPTree().child.numNodes(gatherer);
+
+                                writer.write(i + ",-1,0," +
+                                        solution1.getGPTree().child.numNodes(GPNode.NODESEARCH_ALL) + "," +
+                                        numUniqueTerminals + "," + fitnessString(result, j, fitnessType) +
+                                        "0");
+                                writer.newLine();
+                            }
                             break;
                         default:
                             System.err.println("Unknown solution type: " + solutionType.toString());
@@ -214,7 +249,6 @@ public class GPTest {
         }
     }
 
-
     private static String testFileName(EvaluationModel testEvaluationModel) {
         String str = "";
         for (Objective objective : testEvaluationModel.getObjectives())
@@ -240,28 +274,46 @@ public class GPTest {
         return s;
     }
 
-    private static String fitnessString(GPResult result, int gen, FitnessType fitnessType) {
-        String s = "";
-
-        Fitness trainFit = result.getBestTrainFitness();
-        Fitness testFit = result.getBestTestFitness();
-
-        if (gen != -1) {
-            trainFit = result.getTrainFitnessAtGen(gen);
-            testFit = result.getTestFitnessAtGen(gen);
-        }
-
+    private static String fitnessString(GPResult result, int index, FitnessType fitnessType) {
         switch (fitnessType) {
             case SIMPLE_FITNESS:
-                MultiObjectiveFitness simpleTrainFit = (MultiObjectiveFitness)trainFit;
-                MultiObjectiveFitness simpleTestFit = (MultiObjectiveFitness)testFit;
-                for (int k = 0; k < simpleTrainFit.objectives.length; k++) {
-                    s += k + "," + simpleTrainFit.getObjective(k) + "," +
-                            simpleTestFit.getObjective(k) + ",";
-                }
-                break;
+                return fitnessStringSimple(result, index);
+            case MULTIOBJECTIVE_FITNESS:
+                return fitnessStringMultiobjective(result, index);
+            case DIMENSION_AWARE_FITNESS:
+                return ""; // FIXME not yet implemented.
+            default:
+                throw new RuntimeException("Unknown fitness type: " + fitnessType.toString());
+        }
+    }
+
+    private static String fitnessStringSimple(GPResult result, int gen) {
+        MultiObjectiveFitness trainFit;
+        MultiObjectiveFitness testFit;
+
+        if (gen != -1) {
+            trainFit = (MultiObjectiveFitness) result.getBestTrainFitness().get(0);
+            testFit = (MultiObjectiveFitness) result.getBestTestFitness().get(0);
+        } else {
+            trainFit = (MultiObjectiveFitness) result.getTrainFitnessAtGen(gen);
+            testFit = (MultiObjectiveFitness) result.getTrainFitnessAtGen(gen);
         }
 
+        String s = "";
+        for (int i = 0; i < trainFit.objectives.length; i++) {
+            s += i + "," + trainFit.getObjective(i) + "," + testFit.getObjective(i) + ",";
+        }
+        return s;
+    }
+
+    private static String fitnessStringMultiobjective(GPResult result, int index) {
+        MultiObjectiveFitness trainFit = (MultiObjectiveFitness) result.getBestTrainFitness().get(index);
+        MultiObjectiveFitness testFit = (MultiObjectiveFitness) result.getBestTestFitness().get(index);
+
+        String s = "";
+        for (int i = 0; i < trainFit.objectives.length; i++) {
+            s += i + "," + trainFit.getObjective(i) + "," + testFit.getObjective(i) + ",";
+        }
         return s;
     }
 }

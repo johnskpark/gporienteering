@@ -43,7 +43,7 @@ public class GPAnalysis {
 
         for (int i = 0; i < results.size(); i++) {
             GPResult result = results.get(i);
-            String bestExp = result.getBestExpression();
+            String bestExp = result.getBestExpression().get(0);
             List<String> terminals = LispUtils.terminals(bestExp);
 
             for (String terminal : terminals) {

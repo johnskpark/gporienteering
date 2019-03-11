@@ -227,4 +227,8 @@ public class MOEADEvaluator extends SimpleEvaluator {
         return newInds;
     }
 
+    public double[][][] getMOEADWeights() {
+        return popWeightVectors;
+    }
+
 }
