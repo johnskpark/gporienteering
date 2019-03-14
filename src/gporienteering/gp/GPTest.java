@@ -33,6 +33,7 @@ import java.util.List;
  * Finally, it writes all the related information to a csv file.
  */
 
+// FIXME this really needs to be abstracted out into multiple classes here, fucken oof.
 public class GPTest {
     public static final String P_POLICY_TYPE = "policy-type"; // manual or gp-evolved
     public static final String P_MANUAL_POLICIES = "manual-policies";
@@ -99,21 +100,31 @@ public class GPTest {
                 // test the rules for each generation
                 long start = System.currentTimeMillis();
 
+                MultiObjectiveFitness fitness;
                 switch (solutionType) {
                     case SIMPLE_SOLUTION:
                         for (int j = 0; j < result.getSolutions().size(); j++) {
                             testEvaluationModel.evaluateOriginal(result.getSolutionAtGen(j),
                                     result.getTestFitnessAtGen(j), state);
 
-                            System.out.println("Generation " + j + ": test fitness = " +
-                                    result.getTestFitnessAtGen(j).fitness());
+                            fitness = (MultiObjectiveFitness) result.getTestFitnessAtGen(j);
+                            System.out.print("Generation " + j + ": test fitness = \"" + fitness.getObjective(0));
+                            for (int k = 1; k < fitness.getNumObjectives(); k++) {
+                                System.out.print("," + fitness.getObjective(k));
+                            }
+                            System.out.println("\"");
                         }
 
                         // test the best rule
                         testEvaluationModel.evaluateOriginal(result.getBestSolution().get(0),
                                 result.getBestTestFitness().get(0), state);
-                        System.out.println("Best indi: test fitness = " +
-                                result.getBestTestFitness().get(0).fitness());
+
+                        fitness = (MultiObjectiveFitness) result.getBestTestFitness().get(0);
+                        System.out.print("Best indi: test fitness = \"" + fitness.getObjective(0));
+                        for (int k = 1; k < fitness.getNumObjectives(); k++) {
+                            System.out.print("," + fitness.getObjective(k));
+                        }
+                        System.out.println("\"");
                         break;
                     case MULTIOBJECTIVE_SOLUTION:
                         // test the Pareto Front
@@ -124,8 +135,12 @@ public class GPTest {
                             testEvaluationModel.evaluateOriginal(bestSolutions.get(j),
                                     bestTestFitnesses.get(j), state);
 
-                            System.out.println("Pareto individual " + j + ": test fitness = " +
-                                    bestTestFitnesses.get(j).fitness());
+                            fitness = (MultiObjectiveFitness) bestTestFitnesses.get(j);
+                            System.out.print("Pareto individual " + j + ": test fitness = \"" + fitness.getObjective(0));
+                            for (int k = 1; k < fitness.getNumObjectives(); k++) {
+                                System.out.print("," + fitness.getObjective(k));
+                            }
+                            System.out.println("\"");
                         }
                         break;
                     default:
@@ -264,6 +279,16 @@ public class GPTest {
     }
 
     private static String csvTitle(FitnessType fitnessType) {
+        if (fitnessType.equals(FitnessType.SIMPLE_FITNESS) || fitnessType.equals(FitnessType.DIMENSION_AWARE_FITNESS)) {
+            return csvTitleSimple(fitnessType);
+        } else if (fitnessType.equals(FitnessType.MULTIOBJECTIVE_FITNESS)) {
+            return csvTitleMultiobjective(fitnessType);
+        } else {
+            throw new RuntimeException("Invalid FitnessType: " + fitnessType);
+        }
+    }
+
+    private static String csvTitleSimple(FitnessType fitnessType) {
         String s = "Run,Generation,Subpop,Size,UniqueTerminals,";
 
         if (fitnessType == FitnessType.DIMENSION_AWARE_FITNESS)
@@ -272,6 +297,10 @@ public class GPTest {
         s += "Obj,TrainFitness,TestFitness,Time";
 
         return s;
+    }
+
+    private static String csvTitleMultiobjective(FitnessType fitnessType) {
+        return "Run,ParetoIndividual,Subpop,Size,UniqueTerminals,Obj,TrainFitness,TestFitness,Time";
     }
 
     private static String fitnessString(GPResult result, int index, FitnessType fitnessType) {
@@ -288,15 +317,13 @@ public class GPTest {
     }
 
     private static String fitnessStringSimple(GPResult result, int gen) {
-        MultiObjectiveFitness trainFit;
-        MultiObjectiveFitness testFit;
-
+        MultiObjectiveFitness trainFit, testFit;
         if (gen != -1) {
+            trainFit = (MultiObjectiveFitness) result.getTrainFitnessAtGen(gen);
+            testFit = (MultiObjectiveFitness) result.getTestFitnessAtGen(gen);
+        } else {
             trainFit = (MultiObjectiveFitness) result.getBestTrainFitness().get(0);
             testFit = (MultiObjectiveFitness) result.getBestTestFitness().get(0);
-        } else {
-            trainFit = (MultiObjectiveFitness) result.getTrainFitnessAtGen(gen);
-            testFit = (MultiObjectiveFitness) result.getTrainFitnessAtGen(gen);
         }
 
         String s = "";
@@ -310,10 +337,14 @@ public class GPTest {
         MultiObjectiveFitness trainFit = (MultiObjectiveFitness) result.getBestTrainFitness().get(index);
         MultiObjectiveFitness testFit = (MultiObjectiveFitness) result.getBestTestFitness().get(index);
 
-        String s = "";
-        for (int i = 0; i < trainFit.objectives.length; i++) {
-            s += i + "," + trainFit.getObjective(i) + "," + testFit.getObjective(i) + ",";
+        String obj = "0";
+        String trainFitStr = "" + trainFit.getObjective(0);
+        String testFitStr = "" + testFit.getObjective(0);
+        for (int i = 1; i < trainFit.objectives.length; i++) {
+            obj += "," + i;
+            trainFitStr += "," + trainFit.getObjective(i);
+            testFitStr += "," + testFit.getObjective(i);
         }
-        return s;
+        return String.format("\"%s\",\"%s\",\"%s\",", obj, trainFitStr, testFitStr);
     }
 }

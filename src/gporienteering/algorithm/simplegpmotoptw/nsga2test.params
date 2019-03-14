@@ -3,6 +3,9 @@
 
 parent.0 = test.params
 
+# TODO temporary for working at home, change later down the line.
+train-path = ./
+
 pop.subpop.0.species.fitness = ec.multiobjective.nsga2.NSGA2MultiObjectiveFitness
 
 eval = ec.multiobjective.nsga2.NSGA2Evaluator
