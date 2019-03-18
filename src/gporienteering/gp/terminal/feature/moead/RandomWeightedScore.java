@@ -1,29 +1,23 @@
 package gporienteering.gp.terminal.feature.moead;
 
-import ec.EvolutionState;
-import ec.Problem;
-import ec.gp.*;
-import ec.multiobjective.MultiObjectiveDefaults;
-import ec.multiobjective.MultiObjectiveFitness;
-import ec.multiobjective.moead.MOEADMultiObjectiveFitness;
-import ec.util.Code;
-import ec.util.DecodeReturn;
-import ec.util.Parameter;
-import gporienteering.gp.CalcPriorityProblem;
-import gporienteering.gp.terminal.FeatureGPNode;
-import gporienteering.gp.terminal.feature.Score;
-import gporienteering.gp.terminal.feature.Score2;
-import gputils.DoubleData;
-import gputils.terminal.DoubleERC;
-
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Random;
 
-import static ec.Fitness.P_FITNESS;
-import static ec.multiobjective.MultiObjectiveFitness.P_NUMOBJECTIVES;
+import ec.EvolutionState;
+import ec.Problem;
+import ec.gp.ADFStack;
+import ec.gp.ERC;
+import ec.gp.GPData;
+import ec.gp.GPIndividual;
+import ec.gp.GPNode;
+import ec.util.Code;
+import ec.util.DecodeReturn;
+import gporienteering.gp.CalcPriorityProblem;
+import gporienteering.gp.terminal.feature.Score;
+import gporienteering.gp.terminal.feature.Score2;
+import gputils.DoubleData;
 
 /**
  * Feature: a weighted sum of the scores of the candidate. Weights are generated randomly.
@@ -31,12 +25,11 @@ import static ec.multiobjective.MultiObjectiveFitness.P_NUMOBJECTIVES;
 public class RandomWeightedScore extends ERC {
 
     private double[] weights;
-    private String name;
 
     public RandomWeightedScore() {
         super();
         children = new GPNode[0];
-        name = "RandomWeightedScore";
+        weights = new double[2];
     }
 
     @Override
@@ -118,8 +111,7 @@ public class RandomWeightedScore extends ERC {
 
     @Override
     public String toStringForHumans() {
-//        return "(+ (* " + weights[0] + " " + (new Score()).getName() + " ) (* " + weights[1] + " " + (new Score2()).getName() + "))"; // Only supports two score values for now.
-        return name;
+        return "(+ (* " + weights[0] + " " + (new Score()).getName() + ") (* " + weights[1] + " " + (new Score2()).getName() + "))"; // Only supports two score values for now.
     }
 
     @Override

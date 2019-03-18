@@ -76,6 +76,8 @@ public class ReactiveGPHHProblem extends GPProblem implements SimpleProblemForm 
                          Individual indi,
                          int subpopulation,
                          int threadnum) {
+    	indi.printIndividualForHumans(state, 0);
+    	
         GPPolicy policy =
                 new GPPolicy(poolFilter, ((GPIndividual)indi).trees[0]);
 
