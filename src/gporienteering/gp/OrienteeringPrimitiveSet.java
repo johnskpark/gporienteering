@@ -1,7 +1,8 @@
 package gporienteering.gp;
 
 import gporienteering.gp.terminal.feature.*;
-import gporienteering.gp.terminal.feature.moead.ScoreWeightedSum;
+import gporienteering.gp.terminal.feature.moead.IndividualWeightedScore;
+import gporienteering.gp.terminal.feature.moead.RandomWeightedScore;
 import gputils.function.*;
 import gputils.terminal.PrimitiveSet;
 
@@ -66,7 +67,8 @@ public class OrienteeringPrimitiveSet extends PrimitiveSet {
     public static OrienteeringPrimitiveSet extendedMOTerminalSet() {
         OrienteeringPrimitiveSet terminalSet = OrienteeringPrimitiveSet.multiobjectiveTerminalSet();
 
-        terminalSet.add(new ScoreWeightedSum());
+//        terminalSet.add(new IndividualWeightedScore());
+        terminalSet.add(new RandomWeightedScore());
 
         return terminalSet;
     }

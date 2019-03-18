@@ -4,7 +4,8 @@
 parent.0 = test.params
 
 # TODO temporary for working at home, change later down the line.
-train-path = ./
+train-path = /home/parkjohn/phd_research/grid/orienteering_rules/nsga2_moc101/
+num-trains = 35
 
 pop.subpop.0.species.fitness = ec.multiobjective.nsga2.NSGA2MultiObjectiveFitness
 

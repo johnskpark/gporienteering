@@ -22,14 +22,10 @@ public abstract class FeatureGPNode extends GPNode {
         children = new GPNode[0];
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     @Override
-    public String toString() {
-        return name;
-    }
+    public String toString() { return name; }
 
     @Override
     public int expectedChildren() {
