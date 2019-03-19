@@ -38,6 +38,11 @@ public abstract class TerminalERC extends ERC {
     }
 
     @Override
+    public String toStringForHumans() {
+    	return terminal.toStringForHumans();
+    }
+    
+    @Override
     public String toString() {
         return terminal.toString();
     }

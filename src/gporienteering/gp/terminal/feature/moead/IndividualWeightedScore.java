@@ -1,16 +1,14 @@
 package gporienteering.gp.terminal.feature.moead;
 
+import java.io.PrintWriter;
+
 import ec.EvolutionState;
-import ec.gp.GPIndividual;
-import ec.gp.GPNodeParent;
 import ec.gp.GPTree;
 import ec.multiobjective.moead.MOEADMultiObjectiveFitness;
 import gporienteering.gp.CalcPriorityProblem;
 import gporienteering.gp.terminal.FeatureGPNode;
 import gporienteering.gp.terminal.feature.Score;
 import gporienteering.gp.terminal.feature.Score2;
-
-import java.io.PrintWriter;
 
 /**
  * Feature: a weighted sum of the scores of the candidate. Weights are extracted from individual.
@@ -47,7 +45,7 @@ public class IndividualWeightedScore extends FeatureGPNode {
         GPTree root = (GPTree) rootParent();
         fitness = (MOEADMultiObjectiveFitness) root.owner.fitness;
         weights = fitness.getWeightVector(null);
-
+        
         double[] scores = calcPriorityProblem.getCandidate().getScores();
         double sum = scores[0] * weights[0];
         for (int i = 1; i < scores.length; i++) {

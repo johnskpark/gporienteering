@@ -82,7 +82,7 @@ public class ReactiveGPHHProblem extends GPProblem implements SimpleProblemForm 
         // the evaluation model is reactive, so no plan is specified.
         evaluationModel.evaluate(policy, indi.fitness, state);
 
-        indi.printIndividualForHumans(state, 0);
         indi.evaluated = true;
     }
+
 }
