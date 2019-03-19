@@ -1,7 +1,9 @@
 package gporienteering.gp.terminal.feature.moead;
 
 import ec.EvolutionState;
-import ec.multiobjective.moead.MOEADEvaluator;
+import ec.gp.GPIndividual;
+import ec.gp.GPNodeParent;
+import ec.gp.GPTree;
 import ec.multiobjective.moead.MOEADMultiObjectiveFitness;
 import gporienteering.gp.CalcPriorityProblem;
 import gporienteering.gp.terminal.FeatureGPNode;
@@ -15,21 +17,12 @@ import java.io.PrintWriter;
  */
 public class IndividualWeightedScore extends FeatureGPNode {
 
+    private MOEADMultiObjectiveFitness fitness;
     private double[] weights;
 
     public IndividualWeightedScore() {
         super();
-
-//        weights = new double[2];
-//        updateName();
-        name = "IndividualWeightedScore";
-    }
-
-    @Override
-    public void resetNode(final EvolutionState state, final int thread) {
-        super.resetNode(state, thread);
-
-
+        weights = new double[2];
     }
 
     @Override
@@ -39,16 +32,21 @@ public class IndividualWeightedScore extends FeatureGPNode {
         return n.length();
     }
 
+    @Override
+    public String toStringForHumans() {
+        return "(+ (* " + weights[0] + " " + (new Score()).getName() + ") (* " + weights[1] + " " + (new Score2()).getName() + "))"; // Only supports two score values for now.
+    }
+
+    @Override
+    public String toString() {
+        return "IndividualWeightedScore";
+    }
 
     @Override
     public double value(CalcPriorityProblem calcPriorityProblem) {
-    	// Also, the GP tree in evaluation doesn't contain the individual either, so I'm not sure how this will work at all.
-//        if (individual != null && individual.fitness != null) {
-//            MOEADMultiObjectiveFitness fitness = (MOEADMultiObjectiveFitness) individual.fitness;
-//            double[] weights = fitness.getWeightVector(null);
-//        } else {
-//            throw new RuntimeException("This should not be called outside of evolution and without defined individual.");
-//        }
+        GPTree root = (GPTree) rootParent();
+        fitness = (MOEADMultiObjectiveFitness) root.owner.fitness;
+        weights = fitness.getWeightVector(null);
 
         double[] scores = calcPriorityProblem.getCandidate().getScores();
         double sum = scores[0] * weights[0];
@@ -58,7 +56,4 @@ public class IndividualWeightedScore extends FeatureGPNode {
         return sum;
     }
 
-//    private void updateName() {
-//        name = "(+ (* " + weights[0] + " " + (new Score()).getName() + " ) (* " + weights[1] + " " + (new Score2()).getName() + "))";
-//    }
 }

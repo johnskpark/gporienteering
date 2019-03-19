@@ -67,7 +67,7 @@ public class OrienteeringPrimitiveSet extends PrimitiveSet {
     public static OrienteeringPrimitiveSet extendedMOTerminalSet() {
         OrienteeringPrimitiveSet terminalSet = OrienteeringPrimitiveSet.multiobjectiveTerminalSet();
 
-//        terminalSet.add(new IndividualWeightedScore());
+        terminalSet.add(new IndividualWeightedScore());
         terminalSet.add(new RandomWeightedScore());
 
         return terminalSet;

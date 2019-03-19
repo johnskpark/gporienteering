@@ -35,7 +35,7 @@ eval.problem.eval-model.instances.0.samples = 500
 eval.problem.eval-model.instances.0.days = 3
 eval.problem.eval-model.instances.0.time-ulevel = 0
 eval.problem.eval-model.instances.0.duration-ulevel = 0.2
-eval.problem.eval-model.seed = 25234
+eval.problem.eval-model.seed = 26556
 
 
 

@@ -76,14 +76,13 @@ public class ReactiveGPHHProblem extends GPProblem implements SimpleProblemForm 
                          Individual indi,
                          int subpopulation,
                          int threadnum) {
-    	indi.printIndividualForHumans(state, 0);
-    	
         GPPolicy policy =
                 new GPPolicy(poolFilter, ((GPIndividual)indi).trees[0]);
 
         // the evaluation model is reactive, so no plan is specified.
         evaluationModel.evaluate(policy, indi.fitness, state);
 
+        indi.printIndividualForHumans(state, 0);
         indi.evaluated = true;
     }
 }

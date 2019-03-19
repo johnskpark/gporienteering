@@ -116,7 +116,7 @@ public class RandomWeightedScore extends ERC {
 
     @Override
     public String toString() {
-        return toStringForHumans();
+        return "RandomWeightedScore";
     }
 
     @Override
